@@ -1,3 +1,4 @@
+import { ClientNavTabs } from "@/components/client-nav-tabs";
 import { ClientSelector } from "@/components/client-selector";
 import { InsurancesList } from "@/components/insurances-list";
 import { MovementsList } from "@/components/movements-list";
@@ -14,6 +15,8 @@ export default function Page() {
       <div className="flex items-center">
         <ClientSelector />
       </div>
+
+      <ClientNavTabs />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">

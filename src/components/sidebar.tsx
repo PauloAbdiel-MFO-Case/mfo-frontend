@@ -1,4 +1,4 @@
-"use client"; // Precisamos de interatividade (estado) para abrir/fechar o menu
+"use client"; 
 
 import { useState } from "react";
 import Link from "next/link";
@@ -19,11 +19,16 @@ export function Sidebar() {
 
   return (
     <aside className="sticky top-8 h-[calc(100vh-64px)] w-[280px] rounded-2xl bg-gradient-to-b from-white/[.015] to-white/[.01] p-6 shadow-2xl shadow-black/60 ring-1 ring-white/5">
-      <div className="flex justify-center mb-5">
-        <div className="px-5 py-2 text-lg font-bold tracking-wider text-orange-400 border-2 border-orange-500/10 rounded-full bg-gradient-to-r from-gray-900 to-black shadow-lg shadow-orange-500/5">
-          ✧ Anka
-        </div>
-      </div>
+
+        <div className="flex justify-center mb-5">
+          {/* Div "Pai" com o fundo em gradiente e padding */}
+          <div className="p-[2px] rounded-full bg-[linear-gradient(96.19deg,_#FA4515_65.3%,_#D6A207_82.48%,_#94290C_107.43%)]">
+            {/* Div "Filho" com o fundo real e o conteúdo */}
+            <div className="px-5 py-2 text-lg font-bold tracking-wider text-orange-400 rounded-full bg-gradient-to-r from-[#181818] to-[#0f0f0f]">
+              ✧ Anka
+            </div>
+          </div>
+        </div>  
 
       <nav className="flex flex-col gap-2 mt-2">
         {/* Clientes */}
@@ -37,9 +42,9 @@ export function Sidebar() {
         </div>
         {openMenu === "clientes" && (
           <div className="flex flex-col gap-2 pl-11">
-            <Link href="#" className="px-2 py-2 text-gray-400 rounded-md hover:bg-white/5 hover:text-white">Dashboard</Link>
-            <Link href="#" className="px-2 py-2 text-gray-400 rounded-md hover:bg-white/5 hover:text-white">Projeção</Link>
-            <Link href="#" className="px-2 py-2 text-gray-400 rounded-md hover:bg-white/5 hover:text-white">Histórico</Link>
+            <Link href="/" className="px-2 py-2 text-gray-400 rounded-md hover:bg-white/5 hover:text-white">Dashboard</Link>
+            <Link href="/alocacoes" className="px-2 py-2 text-gray-400 rounded-md hover:bg-white/5 hover:text-white">Projeção</Link>
+            <Link href="/historico" className="px-2 py-2 text-gray-400 rounded-md hover:bg-white/5 hover:text-white">Histórico</Link>
           </div>
         )}
 
