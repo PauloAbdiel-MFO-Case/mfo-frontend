@@ -8,21 +8,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGetProjection } from "@/hooks/useGetProjection";
 
-// Dados estáticos que imitam a resposta da nossa API
-const data = [
-  { year: 2025, financialPatrimony: 165000, nonFinancialPatrimony: 850000 },
-  { year: 2030, financialPatrimony: 688216, nonFinancialPatrimony: 850000 },
-  { year: 2035, financialPatrimony: 1324789, nonFinancialPatrimony: 850000 },
-  { year: 2040, financialPatrimony: 2099278, nonFinancialPatrimony: 850000 },
-  { year: 2045, financialPatrimony: 3041562, nonFinancialPatrimony: 850000 },
-  { year: 2050, financialPatrimony: 4187994, nonFinancialPatrimony: 850000 },
-  { year: 2055, financialPatrimony: 5582804, nonFinancialPatrimony: 850000 },
-  { year: 2060, financialPatrimony: 5849895, nonFinancialPatrimony: 850000 },
-];
-
-// Formata os números para o padrão R$ (ex: 1.2M)
+// Helper para formatar o eixo Y do gráfico
 const formatYAxis = (tick: number) => {
   if (tick >= 1000000) {
     return `R$ ${(tick / 1000000).toFixed(1)}M`;
@@ -33,12 +21,29 @@ const formatYAxis = (tick: number) => {
   return `R$ ${tick}`;
 };
 
-export function Graph() {
+export function Graph({ simulationVersionId }: { simulationVersionId: number | null }) {
+  const { data: projectionData, isLoading, isError } = useGetProjection({
+    simulationVersionId: simulationVersionId,
+    status: 'Vivo',
+  });
+
+  if (isLoading) {
+    return <div className="h-[250px] w-full flex items-center justify-center text-gray-400">Carregando projeção...</div>;
+  }
+
+  if (isError) {
+    return <div className="h-[250px] w-full flex items-center justify-center text-red-400">Erro ao carregar dados.</div>;
+  }
+
+  if (!Array.isArray(projectionData)) {
+    return <div className="h-[250px] w-full flex items-center justify-center text-orange-400">Aguardando seleção...</div>;
+  }
+
   return (
     <div className="h-[250px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={data}
+          data={projectionData}
           margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
         >
           <defs>

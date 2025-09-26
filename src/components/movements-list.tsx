@@ -3,17 +3,10 @@
 import { useState } from "react";
 import { MovementCard } from "./movement-card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Movement } from "@/types/simulation.types"; 
 
-// 1. Adicionamos uma categoria a cada movimentação para podermos filtrar
-const movementsData = [
-  { type: 'credit', title: 'Herança', details: '09/07/23 - Frequência: Única', amount: 'R$ 220.000', category: 'financeira' },
-  { type: 'debit', title: 'Custo do Filho', details: '09/07/23 - Frequência: Mensal', amount: 'R$ 1.500', category: 'financeira' },
-  { type: 'credit', title: 'Comissão', details: '09/07/23 - Frequência: Anual', amount: 'R$ 500.000', category: 'financeira' },
-  { type: 'debit', title: 'Compra de Imóvel', details: '09/07/23 - Frequência: Única', amount: 'R$ 1.500.000', category: 'imobilizada' },
-];
-
-export function MovementsList() {
-  // 2. Adicionamos um estado para controlar qual filtro está ativo
+export function MovementsList({ movements }: { movements: Movement[] }) {
+  const financialMovements = movements.filter(m => m.description !== "Compra de Imóvel"); 
   const [activeFilter, setActiveFilter] = useState('financeira');
 
   return (
@@ -41,12 +34,15 @@ export function MovementsList() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 4. Filtramos a lista antes de renderizar os cards */}
-        {movementsData
-          .filter(movement => movement.category === activeFilter)
-          .map((movement, index) => (
-            <MovementCard key={index} {...movement} />
-          ))}
+        {financialMovements.map((movement) => (
+            <MovementCard 
+                key={movement.id}
+                type={movement.type === 'ENTRADA' ? 'credit' : 'debit'}
+                title={movement.description}
+                details={`Frequência: ${movement.frequency}`}
+                amount={`R$ ${movement.value.toLocaleString('pt-BR')}`}
+            />
+        ))}
       </div>
     </section>
   );
