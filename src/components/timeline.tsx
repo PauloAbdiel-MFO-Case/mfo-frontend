@@ -41,7 +41,7 @@ export function Timeline({ movements = [] }: { movements?: Movement[] }) {
             </div>
 
             <div className="relative h-12">
-              <div className="absolute top-1/2 w-full border-t border-dashed border-white/10" />
+              <div className="absolute top-1/2 w-full border-t border-dashed borderz-white/10" />
               <div className="absolute -top-2 flex justify-between w-full font-semibold text-center text-gray-400">
                   <div><p>2025</p><p className="text-xs text-gray-500">45 anos</p></div>
                   <div><p>2035</p><p className="text-xs text-gray-500">55 anos</p></div>
