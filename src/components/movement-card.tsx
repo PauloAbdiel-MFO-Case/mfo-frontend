@@ -1,15 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowUpCircle, ArrowDownCircle } from "lucide-react";
+import { ArrowUpCircle, ArrowDownCircle, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 interface MovementCardProps {
   type: 'credit' | 'debit';
   title: string;
   details: string;
   amount: string;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
-export function MovementCard({ type, title, details, amount }: MovementCardProps) {
+export function MovementCard({ type, title, details, amount, onEdit, onDelete }: MovementCardProps) {
   const isCredit = type === 'credit';
 
   return (
@@ -18,22 +22,39 @@ export function MovementCard({ type, title, details, amount }: MovementCardProps
       isCredit && "ring-green-500/30"
     )}>
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-bold text-white">{title}</p>
-            <p className="text-xs text-gray-400">{details}</p>
-          </div>
-          <div className="flex items-center gap-2">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
             {isCredit 
-              ? <ArrowUpCircle size={20} className="text-green-400" /> 
-              : <ArrowDownCircle size={20} className="text-red-400" />
+              ? <ArrowUpCircle size={24} className="text-green-400 mt-1" /> 
+              : <ArrowDownCircle size={24} className="text-red-400 mt-1" />
             }
+            <div>
+              <p className="font-bold text-white">{title}</p>
+              <p className="text-xs text-gray-400">{details}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
             <p className={cn(
               "text-lg font-bold",
               isCredit ? "text-green-400" : "text-red-400"
             )}>
               {amount}
             </p>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/10">
+                  <MoreVertical size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#1b1b1b] border-white/10 text-white">
+                <DropdownMenuItem onSelect={onEdit} className="focus:bg-white/10">
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={onDelete} className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                  Deletar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </CardContent>

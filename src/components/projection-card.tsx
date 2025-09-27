@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Graph } from "@/components/graph";
 import { SimulationListItem } from "@/types/simulation.types";
 import { EditSimulationModal } from "./edit-simulation-modal";
+import { AddSimulationModal } from "./add-simulation-modal";
 import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -17,6 +18,7 @@ interface ProjectionCardProps {
 
 export function ProjectionCard({ simulations, selectedVersionId, onSelectSimulation }: ProjectionCardProps) {
   const [editingSimulation, setEditingSimulation] = useState<SimulationListItem | null>(null);
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
 
   return (
     <>
@@ -48,6 +50,9 @@ export function ProjectionCard({ simulations, selectedVersionId, onSelectSimulat
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-[#1b1b1b] border-white/10 text-white">
+                    <DropdownMenuItem onSelect={() => handleCreateNewVersion(sim.simulationId)} className="focus:bg-white/10">
+                      Criar nova versão
+                    </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setEditingSimulation(sim)} className="focus:bg-white/10">
                       Editar
                     </DropdownMenuItem>
@@ -58,7 +63,7 @@ export function ProjectionCard({ simulations, selectedVersionId, onSelectSimulat
                 </DropdownMenu>
               </div>
             ))}
-            <Button variant="outline" className="border-white/10 bg-transparent text-gray-300 hover:bg-white/10">+ Adicionar Simulação</Button>
+            <Button onClick={() => setAddModalOpen(true)} variant="outline" className="border-white/10 bg-transparent text-gray-300 hover:bg-white/10">+ Adicionar Simulação</Button>
           </div>
         </CardContent>
       </Card>
@@ -67,6 +72,12 @@ export function ProjectionCard({ simulations, selectedVersionId, onSelectSimulat
         isOpen={!!editingSimulation}
         simulation={editingSimulation}
         onClose={() => setEditingSimulation(null)}
+      />
+
+      <AddSimulationModal
+        isOpen={isAddModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        sourceVersionId={selectedVersionId}
       />
     </>
   );

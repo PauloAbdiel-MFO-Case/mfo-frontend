@@ -28,6 +28,18 @@ export type Insurance = {
   insuredValue: number;
 };
 
+export type AllocationRecord = {
+  id: number;
+  allocationId: number;
+  value: number;
+  date: string;
+  allocation: {
+    id: number;
+    name: string;
+    type: string;
+  };
+};
+
 export type SimulationVersionDetails = {
   id: number;
   version: number;
@@ -38,4 +50,5 @@ export type SimulationVersionDetails = {
   };
   movements: Movement[];
   insurances: Insurance[];
+  allocationRecords: AllocationRecord[];
 };
