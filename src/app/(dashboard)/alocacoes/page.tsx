@@ -11,6 +11,8 @@ import { useGetSimulations } from "@/hooks/useGetSimulations";
 import { useGetSimulationVersionDetails } from "@/hooks/useGetSimulationVersionDetails";
 import { AddAllocationModal } from '@/components/add-allocation-modal';
 import { EditAllocationModal } from '@/components/edit-allocation-modal';
+import { ConfirmationDialog } from '@/components/confirmation-dialog';
+import { useDeleteAllocation } from '@/hooks/useDeleteAllocation';
 
 function AllocationsPageContent() {
   const searchParams = useSearchParams();
@@ -19,9 +21,12 @@ function AllocationsPageContent() {
   const [selectedVersionId, setSelectedVersionId] = useState<number | null>(null);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [editingAllocation, setEditingAllocation] = useState<{id: number, name: string, type: string} | null>(null);
+  const [isConfirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [allocationToDelete, setAllocationToDelete] = useState<number | null>(null);
 
   const { data: simulations } = useGetSimulations();
   const { data: versionDetails, isLoading: isLoadingDetails } = useGetSimulationVersionDetails(selectedVersionId);
+  const { mutate: deleteAllocation, isPending: isDeleting } = useDeleteAllocation();
 
   useEffect(() => {
     if (versionIdFromUrl) {
@@ -44,11 +49,22 @@ function AllocationsPageContent() {
     }
     acc[key].records.push(record);
     return acc;
-  }, {} as Record<string, { records: any[] } & { id: number; name: string; type: string; }>);
+  }, {} as Record<string, { records: any[] } & { id: number; name: string; type: string; isFinanced?: boolean; totalValue?: number; paidInstallments?: number; totalInstallments?: number; startDate: string; endDate: string | null; }>);
 
-  const handleDelete = (id: number) => {
-    // TODO: implementar lógica de deletar
-    console.log("Deletar alocação", id);
+  const handleDeleteClick = (id: number) => {
+    setAllocationToDelete(id);
+    setConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!allocationToDelete || !selectedVersionId) return;
+
+    deleteAllocation({ allocationId: allocationToDelete, versionId: selectedVersionId }, {
+      onSuccess: () => {
+        setConfirmDeleteOpen(false);
+        setAllocationToDelete(null);
+      }
+    });
   };
 
   return (
@@ -105,7 +121,7 @@ function AllocationsPageContent() {
                 showUpdateButton={alloc.type === "FINANCEIRA"} 
                 hasWarning={alloc.type === "FINANCEIRA" && /* regra de atraso */ false}
                 onEdit={() => setEditingAllocation(alloc)}
-                onDelete={() => handleDelete(alloc.id)}
+                onDelete={() => handleDeleteClick(alloc.id)}
               />
             );
           })}
@@ -122,6 +138,13 @@ function AllocationsPageContent() {
         onClose={() => setEditingAllocation(null)}
         allocation={editingAllocation}
         versionId={selectedVersionId}
+      />
+      <ConfirmationDialog
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        description="Tem certeza que deseja deletar esta alocação e todos os seus registros? Esta ação não pode ser desfeita."
       />
     </div>
   );

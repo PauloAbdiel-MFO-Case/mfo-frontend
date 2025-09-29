@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDeleteSimulation } from "@/hooks/useDeleteSimulation";
 import { ConfirmationDialog } from "./confirmation-dialog";
+import { useCreateNewVersion } from "@/hooks/useCreateNewVersion";
+import { toast } from "sonner";
 
 type ViewMode = 'graph' | 'table';
 
@@ -38,11 +40,12 @@ export function ProjectionCard({
 
   const { data: projectionData, isLoading: isProjectionLoading, isError: isProjectionError } = useGetProjection({
     simulationVersionId: selectedVersionId,
-    status: 'Vivo', 
+    status: 'Vivo',
     calculateWithoutInsurance: showWithoutInsurance,
   });
 
   const { mutate: deleteSimulation } = useDeleteSimulation();
+  const { mutate: createNewVersion } = useCreateNewVersion();
 
   const handleDeleteClick = (versionId: number) => {
     setSimulationToDelete(versionId);
@@ -62,7 +65,14 @@ export function ProjectionCard({
   };
 
   const handleCreateNewVersion = (simulationId: number) => {
-    console.log("Criar nova versão para:", simulationId)
+    createNewVersion(simulationId, {
+      onSuccess: () => {
+        toast.success("Nova versão criada com sucesso!");
+      },
+      onError: () => {
+        toast.error("Erro ao criar nova versão.");
+      },
+    });
   };
 
   return (

@@ -49,12 +49,15 @@ export function EditSimulationModal({ isOpen, onClose, simulation }: EditSimulat
     if (!simulation) return;
 
     updateSimulation({
-      id: simulation.id,
-      name: values.name,
-      startDate: new Date(values.startDate),
-      realInterestRate: values.realInterestRate,
+      versionId: simulation.id,
+      payload: {
+        name: values.name,
+        startDate: new Date(values.startDate),
+        realInterestRate: values.realInterestRate,
+      }
     }, {
       onSuccess: () => {
+        form.reset();
         onClose();
       }
     });
