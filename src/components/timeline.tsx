@@ -2,11 +2,13 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Movement } from "@/types/simulation.types";
+import { cn } from "@/lib/utils";
 
-export function Timeline({ movements = [] }: { movements?: Movement[] }) {
-  const incomeMovements = movements.filter(m => m.type === "ENTRADA");
-  const expenseMovements = movements.filter(m => m.type === "SAIDA");
+interface TimelineProps {
+  movements?: Movement[];
+}
 
+export function Timeline({ movements = [] }: TimelineProps) {
   const timelineStartYear = 2025;
   const timelineEndYear = 2060;
   const timelineDuration = timelineEndYear - timelineStartYear;
@@ -25,32 +27,23 @@ export function Timeline({ movements = [] }: { movements?: Movement[] }) {
     return percentage;
   };
 
-  const adjustPositions = (items: any[]) => {
-    const spacing = 4; // % mínimo entre pontos
-    let lastPos = -spacing;
-    return items.map((item, idx) => {
-      let pos = item.pos;
-      if (pos - lastPos < spacing) {
-        pos = lastPos + spacing;
-      }
-      lastPos = pos;
-      return { ...item, pos, idx };
-    });
-  };
+  // Quebra os movimentos por tipo
+  const incomes = movements.filter(m => m.type === "ENTRADA").map(m => ({
+    ...m,
+    pos: calculatePosition(m.startDate),
+  }));
 
-  const incomes = adjustPositions(
-    incomeMovements.map(m => ({
-      ...m,
-      pos: calculatePosition(m.startDate),
-    }))
-  );
+  const expenses = movements.filter(m => m.type === "SAIDA").map(m => ({
+    ...m,
+    pos: calculatePosition(m.startDate),
+  }));
 
-  const expenses = adjustPositions(
-    expenseMovements.map(m => ({
-      ...m,
-      pos: calculatePosition(m.startDate),
-    }))
-  );
+  // Gera grid de anos dinâmico
+  const yearMarks = [];
+  for (let year = timelineStartYear; year <= timelineEndYear; year += 10) {
+    const age = 45 + (year - timelineStartYear);
+    yearMarks.push({ year, age });
+  }
 
   return (
     <div className="mt-8">
@@ -73,13 +66,14 @@ export function Timeline({ movements = [] }: { movements?: Movement[] }) {
                   style={{ left: `${move.pos}%` }}
                 >
                   {/* Linha vertical */}
-                  <div className="absolute top-[-40px] w-px h-20 bg-white/20 left-1/2 -translate-x-1/2" />
+                  <div className="absolute top-[-32px] w-px h-16 bg-white/20 left-1/2 -translate-x-1/2" />
 
-                  {/* Label alternando cima/baixo */}
+                  {/* Label */}
                   <div
-                    className={`absolute w-max text-xs text-gray-400 -translate-x-1/2 ${
-                      i % 2 === 0 ? "-top-10" : "top-4"
-                    }`}
+                    className={cn(
+                      "absolute w-max text-xs text-gray-300 font-medium -translate-x-1/2",
+                      i % 2 === 0 ? "-top-8" : "top-4"
+                    )}
                   >
                     {move.description}: R$ {move.value.toLocaleString("pt-BR")}
                   </div>
@@ -90,31 +84,24 @@ export function Timeline({ movements = [] }: { movements?: Movement[] }) {
               ))}
             </div>
 
-            {/* Linha central da timeline */}
+            {/* Linha central - Anos/Idades */}
             <div className="relative h-24">
               <span className="absolute -left-32 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">
                 Ano / Idade
               </span>
               <div className="absolute top-1/2 w-full border-t border-dashed border-white/10" />
 
-              {/* Marcas principais */}
               <div className="absolute top-1/2 w-full flex justify-between text-center">
-                <div className="-translate-x-1/2">
-                  <p className="text-sm font-semibold text-gray-400">2025</p>
-                  <p className="text-xs text-gray-500">45 anos</p>
-                </div>
-                <div className="-translate-x-1/2">
-                  <p className="text-sm font-semibold text-gray-400">2035</p>
-                  <p className="text-xs text-gray-500">55 anos</p>
-                </div>
-                <div className="-translate-x-1/2">
-                  <p className="text-sm font-semibold text-gray-400">2045</p>
-                  <p className="text-xs text-gray-500">65 anos</p>
-                </div>
-                <div className="-translate-x-1/2">
-                  <p className="text-sm font-semibold text-gray-400">2060</p>
-                  <p className="text-xs text-gray-500">80 anos</p>
-                </div>
+                {yearMarks.map(mark => (
+                  <div
+                    key={mark.year}
+                    style={{ left: `${((mark.year - timelineStartYear) / timelineDuration) * 100}%` }}
+                    className="absolute -translate-x-1/2"
+                  >
+                    <p className="text-sm font-semibold text-gray-400">{mark.year}</p>
+                    <p className="text-xs text-gray-500">{mark.age} anos</p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -137,11 +124,12 @@ export function Timeline({ movements = [] }: { movements?: Movement[] }) {
                   {/* Bolinha */}
                   <div className="w-3 h-3 -mt-[6px] -ml-[6px] bg-red-500 rounded-full ring-4 ring-[#0f0f0f]" />
 
-                  {/* Label alternando cima/baixo */}
+                  {/* Label */}
                   <div
-                    className={`absolute w-max text-xs text-gray-400 -translate-x-1/2 ${
+                    className={cn(
+                      "absolute w-max text-xs text-gray-300 font-medium -translate-x-1/2",
                       i % 2 === 0 ? "top-4" : "top-8"
-                    }`}
+                    )}
                   >
                     R$ {move.value.toLocaleString("pt-BR")}
                   </div>

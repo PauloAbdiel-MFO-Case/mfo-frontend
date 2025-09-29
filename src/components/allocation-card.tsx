@@ -3,90 +3,141 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, Pencil } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AllocationCardProps {
   name: string;
-  type: string;
+  type: "Financeira" | "Imobilizada";
+  subtype?: "Manual" | "Financiado";
+  startDate?: string;
+  endDate?: string;
   value: string;
-  lastUpdate: string;
-  isFinanced?: boolean;
   totalValue?: string;
-  progress?: number;
+  progress?: { current: number; total: number };
+  lastUpdate: string;
+  showUpdateButton?: boolean;
+  hasWarning?: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-export function AllocationCard({ 
-  name, 
-  type, 
-  value, 
-  lastUpdate, 
-  isFinanced, 
-  totalValue, 
+export function AllocationCard({
+  name,
+  type,
+  subtype,
+  startDate,
+  endDate,
+  value,
+  totalValue,
   progress,
+  lastUpdate,
+  showUpdateButton,
+  hasWarning,
   onEdit,
   onDelete
 }: AllocationCardProps) {
   return (
-    <Card className="bg-gradient-to-b from-white/[.015] to-transparent ring-1 ring-white/5">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-4">
-          {/* Name and Type */}
-          <div className="md:col-span-1">
-            <p className="font-bold text-white">{name}</p>
-            <p className="text-xs text-gray-400">{type}</p>
-          </div>
-
-          {/* Value and Financed Info */}
-          <div className="md:col-span-1">
-            <p className="font-semibold text-white">{value}</p>
-            {isFinanced && totalValue && (
-              <p className="text-xs text-gray-400">de {totalValue}</p>
+    <Card className="bg-zinc-900 border border-white/10 rounded-xl">
+      <CardContent className="p-4 flex flex-col gap-2">
+        {/* Linha superior: nome + badges */}
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-semibold text-white">{name}</p>
+            {type === "Financeira" && (
+              <Badge className="bg-green-200 text-green-900 text-xs font-medium rounded-full">
+                {subtype === "Manual" ? "Financeira Manual" : "Financeira"}
+              </Badge>
+            )}
+            {type === "Imobilizada" && (
+              <Badge className="bg-orange-200 text-orange-900 text-xs font-medium rounded-full">
+                Imobilizada
+              </Badge>
+            )}
+            {subtype === "Financiado" && (
+              <Badge className="bg-gray-200 text-gray-900 text-xs font-medium rounded-full">
+                Financiado
+              </Badge>
             )}
           </div>
 
-          {/* Progress Bar or Last Update */}
-          <div className="md:col-span-1">
-            {isFinanced && progress !== undefined ? (
-              <div className="flex items-center gap-2">
-                <Progress value={progress} className="h-2 bg-black/20" indicatorClassName="bg-green-500" />
-                <span className="text-xs font-medium text-gray-300">{progress}%</span>
-              </div>
-            ) : (
-              <div>
-                <p className="text-xs text-gray-400">Última atualização</p>
-                <p className="font-medium text-white">{lastUpdate}</p>
-              </div>
-            )}
-          </div>
+          {/* Menu de ações */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-400 hover:text-white hover:bg-white/10"
+              >
+                <MoreVertical size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#1b1b1b] border-white/10 text-white">
+              <DropdownMenuItem onSelect={onEdit} className="focus:bg-white/10">
+                Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={onDelete}
+                className="text-red-400 focus:bg-red-500/10 focus:text-red-400"
+              >
+                Deletar
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-          {/* Status/Actions */}
-          <div className="md:col-span-1 flex justify-end items-center">
-            <Badge variant="outline" className={cn(
-              type === "Imobilizada" ? "border-blue-500/50 text-blue-400" : "border-fuchsia-500/50 text-fuchsia-400"
-            )}>
-              {type}
-            </Badge>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="default" size="icon" className="h-8 w-8 hover:bg-white/40">
-                  <MoreVertical size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#1b1b1b] border-white/10 text-white">
-                <DropdownMenuItem onSelect={onEdit} className="focus:bg-white/10">
-                  Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={onDelete} className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
-                  Deletar
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Datas */}
+        {(startDate || endDate) && (
+          <p className="text-sm text-gray-400">
+            {startDate} {endDate && `– ${endDate}`}
+          </p>
+        )}
+
+        {/* Valor */}
+        <div className="flex items-center justify-between">
+          <p className="text-lg font-bold text-white">{value}</p>
+          {isFinite(Number(totalValue)) && totalValue && (
+            <p className="text-sm text-gray-400">de {totalValue}</p>
+          )}
+        </div>
+
+        {/* Progresso se financiado */}
+        {progress && (
+          <div>
+            <p className="text-xs text-gray-400">
+              Progresso: {progress.current}/{progress.total} parcelas
+            </p>
+            <Progress
+              value={(progress.current / progress.total) * 100}
+              className="h-2 bg-black/20"
+              indicatorClassName="bg-orange-500"
+            />
           </div>
+        )}
+
+        {/* Última atualização + botão atualizar */}
+        <div className="flex justify-between items-center text-xs mt-1">
+          <p
+            className={cn(
+              "text-gray-400",
+              hasWarning && "text-orange-400 flex items-center gap-1"
+            )}
+          >
+            {hasWarning && "⚠"} Última atualização: {lastUpdate}
+          </p>
+          {showUpdateButton && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onEdit}
+              className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white gap-1"
+            >
+              <Pencil size={14} />
+              Atualizar
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -84,7 +84,11 @@ export function ProjectionCard({
                 variant="outline"
                 size="sm"
                 onClick={() => setViewMode('graph')}
-                className={viewMode === 'graph' ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5'}
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  viewMode === 'graph'
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/40'
+                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                }`}
               >
                 Gráfico
               </Button>
@@ -92,7 +96,11 @@ export function ProjectionCard({
                 variant="outline"
                 size="sm"
                 onClick={() => setViewMode('table')}
-                className={viewMode === 'table' ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5'}
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  viewMode === 'table'
+                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
+                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                }`}
               >
                 Tabela
               </Button>

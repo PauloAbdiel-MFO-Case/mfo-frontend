@@ -50,7 +50,7 @@ export function Graph({ projectionData, projectionDataWithoutInsurance, isLoadin
         >
           <defs>
             <linearGradient id="colorFinancial" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#2de27a" stopOpacity={0.4} />
+              <stop offset="5%" stopColor="#2de27a" stopOpacity={0.6} /> 
               <stop offset="95%" stopColor="#2de27a" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="colorNonFinancial" x1="0" y1="0" x2="0" y2="1">
@@ -77,6 +77,7 @@ export function Graph({ projectionData, projectionDataWithoutInsurance, isLoadin
             dataKey="nonFinancialPatrimony"
             stackId="1"
             stroke="#2bb7ff"
+            strokeDasharray="4 4"
             fill="url(#colorNonFinancial)"
             strokeWidth={2}
           />
@@ -94,6 +95,7 @@ export function Graph({ projectionData, projectionDataWithoutInsurance, isLoadin
               dataKey="totalPatrimony"
               data={projectionDataWithoutInsurance}
               stroke="#ffc658"
+              strokeDasharray="5 5"
               fill="url(#colorTotalWithoutInsurance)"
               strokeWidth={2}
               name="Total s/ Seguros"
