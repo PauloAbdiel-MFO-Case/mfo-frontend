@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/service/api';
+import { toast } from 'sonner';
 
 interface UpdateAllocationPayload {
   name?: string;
@@ -14,9 +15,9 @@ interface UpdateAllocationVariables {
   payload: UpdateAllocationPayload;
 }
 
-const updateAllocation = async ({ allocationId, payload }: Omit<UpdateAllocationVariables, 'versionId'>) => {
+const updateAllocation = async ({ allocationId, versionId, payload }: UpdateAllocationVariables) => {
   const { data } = await api.put(`/allocations/${allocationId}`, payload);
-  return data;
+  return { ...data, versionId };
 };
 
 export const useUpdateAllocation = () => {
@@ -24,8 +25,12 @@ export const useUpdateAllocation = () => {
 
   return useMutation({
     mutationFn: updateAllocation,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', variables.versionId] });
+    onSuccess: (data) => {
+      toast.success('Alocação atualizada com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', data.versionId] });
+    },
+    onError: () => {
+      toast.error('Ocorreu um erro ao atualizar a alocação.');
     },
   });
 };

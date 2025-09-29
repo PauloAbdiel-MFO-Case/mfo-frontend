@@ -2,14 +2,16 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/service/api';
+import { toast } from 'sonner';
 
 interface DeleteMovementVariables {
   movementId: number;
   versionId: number;
 }
 
-const deleteMovement = async ({ movementId }: Omit<DeleteMovementVariables, 'versionId'>) => {
+const deleteMovement = async ({ movementId, versionId }: DeleteMovementVariables) => {
   await api.delete(`/movements/${movementId}`);
+  return { versionId };
 };
 
 export const useDeleteMovement = () => {
@@ -17,8 +19,12 @@ export const useDeleteMovement = () => {
 
   return useMutation({
     mutationFn: deleteMovement,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', variables.versionId] });
+    onSuccess: (data) => {
+      toast.success('Movimento deletado com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', data.versionId] });
+    },
+    onError: () => {
+      toast.error('Ocorreu um erro ao deletar o movimento.');
     },
   });
 };

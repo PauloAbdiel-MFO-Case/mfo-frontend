@@ -23,7 +23,7 @@ const updateSimulation = async ({ versionId, payload }: UpdateSimulationVariable
 export const useUpdateSimulation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<any, Error, UpdateSimulationVariables, any>({
+  return useMutation<SimulationVersion, Error, UpdateSimulationVariables, { onSuccess?: () => void; onError?: (error: Error) => void; }>({
     mutationFn: updateSimulation,
     onSuccess: (data, variables, context) => {
       toast.success('Simulação atualizada com sucesso!');

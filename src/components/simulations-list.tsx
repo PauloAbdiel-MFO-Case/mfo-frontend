@@ -60,7 +60,7 @@ export function SimulationsList() {
   const [isConfirmCreateNewVersionOpen, setIsConfirmCreateNewVersionOpen] = useState(false);
   const [simulationToCreateNewVersion, setSimulationToCreateNewVersion] = useState<number | null>(null);
 
-  const { data: history, isLoading, error } = useQuery<EnrichedSimulation[]>({ 
+  const { data: history, isLoading, error } = useQuery<EnrichedSimulation[], Error>({
     queryKey: ['simulationsHistory'], 
     queryFn: () => api.get('/simulations/history').then(res => res.data) 
   });
@@ -138,7 +138,6 @@ export function SimulationsList() {
       <AddSimulationModal
         isOpen={isAddModalOpen}
         onClose={() => setAddModalOpen(false)}
-        simulations={history || []}
       />
 
       <EditSimulationModal

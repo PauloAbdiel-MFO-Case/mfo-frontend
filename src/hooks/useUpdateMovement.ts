@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/service/api';
 import { Movement } from '@prisma/client';
+import { toast } from 'sonner';
 
 interface UpdateMovementPayload extends Partial<Omit<Movement, 'id' | 'simulationVersionId'>> {}
 
@@ -12,9 +13,9 @@ interface UpdateMovementVariables {
   payload: UpdateMovementPayload;
 }
 
-const updateMovement = async ({ movementId, payload }: Omit<UpdateMovementVariables, 'versionId'>) => {
+const updateMovement = async ({ movementId, versionId, payload }: UpdateMovementVariables) => {
   const { data } = await api.put(`/movements/${movementId}`, payload);
-  return data;
+  return { ...data, versionId };
 };
 
 export const useUpdateMovement = () => {
@@ -22,8 +23,12 @@ export const useUpdateMovement = () => {
 
   return useMutation({
     mutationFn: updateMovement,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', variables.versionId] });
+    onSuccess: (data) => {
+      toast.success('Movimento atualizado com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', data.versionId] });
+    },
+    onError: () => {
+      toast.error('Ocorreu um erro ao atualizar o movimento.');
     },
   });
 };

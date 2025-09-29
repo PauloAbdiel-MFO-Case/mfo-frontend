@@ -3,18 +3,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "./ui/button";
 import Link from "next/link";
 
-// Using `any` here because the full backend type is not defined yet in a shared location.
-// This should be replaced with a proper type import later.
-interface Version extends Record<string, any> {
-  id: number;
-  version: number;
-  createdAt: string;
-  finalPatrimony: number;
-}
+import { VersionWithPatrimony } from "@/types/history.types";
 
 interface HistoryCardProps {
   simulationName: string;
-  versions: Version[];
+  versions: VersionWithPatrimony[];
 }
 
 export function HistoryCard({ simulationName, versions }: HistoryCardProps) {

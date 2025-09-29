@@ -13,9 +13,8 @@ export function Timeline({ movements = [] }: TimelineProps) {
   const timelineEndYear = 2060;
   const timelineDuration = timelineEndYear - timelineStartYear;
 
-  const calculatePosition = (dateString: string) => {
-    if (!dateString) return 0;
-    const date = new Date(dateString);
+  const calculatePosition = (date: Date) => {
+    if (!date) return 0;
     const year = date.getFullYear();
     const month = date.getMonth();
 
@@ -30,12 +29,12 @@ export function Timeline({ movements = [] }: TimelineProps) {
   // Quebra os movimentos por tipo
   const incomes = movements.filter(m => m.type === "ENTRADA").map(m => ({
     ...m,
-    pos: calculatePosition(m.startDate),
+    pos: calculatePosition(new Date(m.startDate)),
   }));
 
   const expenses = movements.filter(m => m.type === "SAIDA").map(m => ({
     ...m,
-    pos: calculatePosition(m.startDate),
+    pos: calculatePosition(new Date(m.startDate)),
   }));
 
   // Gera grid de anos dinâmico

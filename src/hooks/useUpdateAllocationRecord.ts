@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/service/api';
+import { toast } from 'sonner';
 
 interface UpdateAllocationRecordPayload {
   value?: number;
@@ -14,9 +15,9 @@ interface UpdateAllocationRecordVariables {
   payload: UpdateAllocationRecordPayload;
 }
 
-const updateAllocationRecord = async ({ recordId, payload }: Omit<UpdateAllocationRecordVariables, 'versionId'>) => {
+const updateAllocationRecord = async ({ recordId, versionId, payload }: UpdateAllocationRecordVariables) => {
   const { data } = await api.put(`/allocation-records/${recordId}`, payload);
-  return data;
+  return { ...data, versionId };
 };
 
 export const useUpdateAllocationRecord = () => {
@@ -24,8 +25,12 @@ export const useUpdateAllocationRecord = () => {
 
   return useMutation({
     mutationFn: updateAllocationRecord,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', variables.versionId] });
+    onSuccess: (data) => {
+      toast.success('Registro de alocação atualizado com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ['simulationVersionDetails', data.versionId] });
+    },
+    onError: () => {
+      toast.error('Ocorreu um erro ao atualizar o registro de alocação.');
     },
   });
 };

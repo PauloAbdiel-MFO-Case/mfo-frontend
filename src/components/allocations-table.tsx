@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AllocationRecord } from '@/types/simulation.types';
+import { Allocation, AllocationRecord } from '@/types/simulation.types';
 import { Button } from './ui/button';
 import { AddAllocationRecordModal } from './add-allocation-record-modal';
 import { EditAllocationRecordModal } from './edit-allocation-record-modal';
@@ -10,18 +10,27 @@ import { useDeleteAllocationRecord } from '@/hooks/useDeleteAllocationRecord';
 import { MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
+interface GroupedAllocation extends Allocation {
+  records: AllocationRecord[];
+}
+
 interface AllocationsTableProps {
   allocations: AllocationRecord[];
   versionId: number | null;
 }
 
 export function AllocationsTable({ allocations, versionId }: AllocationsTableProps) {
-  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [isAddModalOpen, setAddModalOpen] = useState<boolean>(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+  const [selectedAllocationId, setSelectedAllocationId] = useState<number | null>(null);
+  const [updatingAllocationId, setUpdatingAllocationId] = useState<number | null>(null);
+  const [editingRecord, setEditingRecord] = useState<AllocationRecord | null>(null);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState<boolean>(false);
   const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
 
   const { mutate: deleteRecord } = useDeleteAllocationRecord();
 
-  const groupedAllocations = allocations.reduce((acc, record) => {
+  const groupedAllocations: Record<string, GroupedAllocation> = allocations.reduce((acc, record) => {
     const key = record.allocation.name;
     if (!acc[key]) {
       acc[key] = {
@@ -31,7 +40,7 @@ export function AllocationsTable({ allocations, versionId }: AllocationsTablePro
     }
     acc[key].records.push(record);
     return acc;
-  }, {} as Record<string, { records: AllocationRecord[] } & AllocationRecord['allocation']>);
+  }, {} as Record<string, GroupedAllocation>);
 
   const handleOpenAddModal = (allocationId: number) => {
     setSelectedAllocationId(allocationId);
