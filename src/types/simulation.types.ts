@@ -11,7 +11,7 @@ export type SimulationListItem = {
 
 export type Movement = {
   id: number;
-  type: string;
+  type: 'ENTRADA' | 'SAIDA' | 'IMOBILIZADA';
   description: string;
   value: number;
   frequency: string;

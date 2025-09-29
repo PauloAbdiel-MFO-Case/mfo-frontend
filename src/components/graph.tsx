@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useGetProjection } from "@/hooks/useGetProjection";
+import { ProjectionResult } from "@/types/projection.types";
 
 // Helper para formatar o eixo Y do gráfico
 const formatYAxis = (tick: number) => {
@@ -21,12 +21,14 @@ const formatYAxis = (tick: number) => {
   return `R$ ${tick}`;
 };
 
-export function Graph({ simulationVersionId }: { simulationVersionId: number | null }) {
-  const { data: projectionData, isLoading, isError } = useGetProjection({
-    simulationVersionId: simulationVersionId,
-    status: 'Vivo',
-  });
+interface GraphProps {
+  projectionData: ProjectionResult[] | undefined;
+  projectionDataWithoutInsurance?: ProjectionResult[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
+}
 
+export function Graph({ projectionData, projectionDataWithoutInsurance, isLoading, isError }: GraphProps) {
   if (isLoading) {
     return <div className="h-[250px] w-full flex items-center justify-center text-gray-400">Carregando projeção...</div>;
   }
@@ -35,8 +37,8 @@ export function Graph({ simulationVersionId }: { simulationVersionId: number | n
     return <div className="h-[250px] w-full flex items-center justify-center text-red-400">Erro ao carregar dados.</div>;
   }
 
-  if (!Array.isArray(projectionData)) {
-    return <div className="h-[250px] w-full flex items-center justify-center text-orange-400">Aguardando seleção...</div>;
+  if (!projectionData || projectionData.length === 0) {
+    return <div className="h-[250px] w-full flex items-center justify-center text-orange-400">Aguardando seleção ou dados indisponíveis...</div>;
   }
 
   return (
@@ -54,6 +56,10 @@ export function Graph({ simulationVersionId }: { simulationVersionId: number | n
             <linearGradient id="colorNonFinancial" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#2bb7ff" stopOpacity={0.5} />
               <stop offset="95%" stopColor="#2bb7ff" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="colorTotalWithoutInsurance" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#ffc658" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="#ffc658" stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis dataKey="year" stroke="#9aa0a6" fontSize={12} tickLine={false} axisLine={false} />
@@ -82,6 +88,18 @@ export function Graph({ simulationVersionId }: { simulationVersionId: number | n
             fill="url(#colorFinancial)"
             strokeWidth={2}
           />
+          {projectionDataWithoutInsurance && (
+            <Area
+              type="monotone"
+              dataKey="totalPatrimony"
+              data={projectionDataWithoutInsurance}
+              stroke="#ffc658"
+              fill="url(#colorTotalWithoutInsurance)"
+              strokeWidth={2}
+              name="Total s/ Seguros"
+              stackId="2"
+            />
+          )}
         </AreaChart>
       </ResponsiveContainer>
     </div>

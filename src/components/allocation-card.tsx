@@ -73,7 +73,7 @@ export function AllocationCard({
             </Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/10">
+                <Button variant="default" size="icon" className="h-8 w-8 hover:bg-white/40">
                   <MoreVertical size={16} />
                 </Button>
               </DropdownMenuTrigger>

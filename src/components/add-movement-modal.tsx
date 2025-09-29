@@ -138,7 +138,33 @@ export function AddMovementModal({ versionId, isOpen, onClose }: AddMovementModa
               )}
             />
 
-            {/* TODO: Add date pickers for startDate and endDate */}
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-300">Data de Início</FormLabel>
+                  <FormControl>
+                    <Input type="date" className="bg-black/30 border-white/10" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-300">Data de Fim (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input type="date" className="bg-black/30 border-white/10" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={onClose} className="border-white/10 bg-white/5 hover:bg-white/10">

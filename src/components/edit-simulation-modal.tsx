@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,26 +9,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SimulationListItem } from "@/types/simulation.types";
 import { useUpdateSimulation } from "@/hooks/useUpdateSimulation";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
-  startDate: z.coerce.date(),
-  realInterestRate: z.coerce.number().min(0, "A taxa deve ser positiva."),
+  startDate: z.string().min(1, "A data de início é obrigatória."),
+  realInterestRate: z.coerce.number().min(0, "A taxa de juros real deve ser positiva."),
 });
 
 interface EditSimulationModalProps {
-  simulation: SimulationListItem | null;
   isOpen: boolean;
   onClose: () => void;
+  simulation: SimulationListItem | null;
 }
 
-export function EditSimulationModal({ simulation, isOpen, onClose }: EditSimulationModalProps) {
+export function EditSimulationModal({ isOpen, onClose, simulation }: EditSimulationModalProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      startDate: new Date(),
-      realInterestRate: 0.04,
+      name: simulation?.simulation.name || "",
+      startDate: simulation?.startDate ? new Date(simulation.startDate).toISOString().split('T')[0] : "",
+      realInterestRate: simulation?.realInterestRate || 0,
     }
   });
 
@@ -37,36 +37,42 @@ export function EditSimulationModal({ simulation, isOpen, onClose }: EditSimulat
     if (simulation) {
       form.reset({
         name: simulation.simulation.name,
-        startDate: new Date(),
-        realInterestRate: 0.04,
+        startDate: simulation.startDate ? new Date(simulation.startDate).toISOString().split('T')[0] : "",
+        realInterestRate: simulation.realInterestRate,
       });
     }
-  }, [simulation, form.reset]);
+  }, [simulation, form]);
 
   const { mutate: updateSimulation, isPending } = useUpdateSimulation();
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!simulation) return;
-    
+
     updateSimulation({
-      versionId: simulation.id,
-      payload: values,
+      id: simulation.id,
+      name: values.name,
+      startDate: new Date(values.startDate),
+      realInterestRate: values.realInterestRate,
     }, {
       onSuccess: () => {
         onClose();
       }
     });
   };
-  
-  if (!simulation) return null;
+
+  const isSituacaoAtual = simulation?.simulation.name === 'Situação Atual';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-[#141414] border-white/10 text-white">
         <DialogHeader>
-          <DialogTitle>Editar Simulação: {simulation.simulation.name}</DialogTitle>
+          <DialogTitle>Editar Simulação</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Faça as alterações nos dados da simulação.
+            {isSituacaoAtual ? (
+              "Esta é a simulação 'Situação Atual' e não pode ser editada."
+            ) : (
+              "Edite os detalhes da simulação."
+            )}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -78,18 +84,43 @@ export function EditSimulationModal({ simulation, isOpen, onClose }: EditSimulat
                 <FormItem>
                   <FormLabel className="text-gray-300">Nome da Simulação</FormLabel>
                   <FormControl>
-                    <Input className="bg-black/30 border-white/10 ring-offset-black focus-visible:ring-orange-400" {...field} />
+                    <Input disabled={isSituacaoAtual} className="bg-black/30 border-white/10 ring-offset-black focus-visible:ring-orange-400" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* Adicione aqui os outros campos (startDate, realInterestRate) se necessário */}
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-300">Data de Início</FormLabel>
+                  <FormControl>
+                    <Input type="date" disabled={isSituacaoAtual} className="bg-black/30 border-white/10 ring-offset-black focus-visible:ring-orange-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="realInterestRate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-300">Taxa de Juros Real</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="0.01" disabled={isSituacaoAtual} className="bg-black/30 border-white/10 ring-offset-black focus-visible:ring-orange-400" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={onClose} className="border-white/10 bg-white/5 hover:bg-white/10">
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isPending} className="bg-orange-500 hover:bg-orange-600 text-white font-bold">
+              <Button type="submit" disabled={isPending || isSituacaoAtual} className="bg-orange-500 hover:bg-orange-600 text-white font-bold">
                 {isPending ? "Salvando..." : "Salvar Alterações"}
               </Button>
             </DialogFooter>

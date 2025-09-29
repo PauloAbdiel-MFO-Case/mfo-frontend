@@ -1,25 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/service/api';
-import { ProjectionResult } from '@/types/projection.types'; 
+import { FullProjectionResult } from '@/types/projection.types'; 
 
 interface GetProjectionParams {
   simulationVersionId: number | null;
   status: 'Vivo' | 'Morto';
+  calculateWithoutInsurance?: boolean;
 }
 
-const getProjection = async ({ simulationVersionId, status }: GetProjectionParams) => {
+const getProjection = async ({ simulationVersionId, status, calculateWithoutInsurance }: GetProjectionParams) => {
   if (!simulationVersionId) return null;
 
-  const { data } = await api.get<ProjectionResult[]>(
-    `/simulations/${simulationVersionId}/projection?status=${status}`
+  const { data } = await api.get<FullProjectionResult>(
+    `/simulations/${simulationVersionId}/projection?status=${status}&calculateWithoutInsurance=${calculateWithoutInsurance}`
   );
   return data;
 };
 
-export const useGetProjection = ({ simulationVersionId, status }: GetProjectionParams) => {
+export const useGetProjection = ({ simulationVersionId, status, calculateWithoutInsurance }: GetProjectionParams) => {
   const query = useQuery({
-    queryKey: ['projection', simulationVersionId, status],
-    queryFn: () => getProjection({ simulationVersionId, status }),
+    queryKey: ['projection', simulationVersionId, status, calculateWithoutInsurance],
+    queryFn: () => getProjection({ simulationVersionId, status, calculateWithoutInsurance }),
     enabled: !!simulationVersionId,
   });
 

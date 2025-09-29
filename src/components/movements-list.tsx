@@ -8,6 +8,7 @@ import { Button } from './ui/button';
 import { AddMovementModal } from './add-movement-modal';
 import { EditMovementModal } from './edit-movement-modal';
 import { useDeleteMovement } from '@/hooks/useDeleteMovement';
+import { ConfirmationDialog } from './confirmation-dialog';
 
 interface MovementsListProps {
   movements: Movement[];
@@ -18,18 +19,30 @@ export function MovementsList({ movements, versionId }: MovementsListProps) {
   const [activeFilter, setActiveFilter] = useState('financeira');
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [editingMovement, setEditingMovement] = useState<Movement | null>(null);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [movementToDelete, setMovementToDelete] = useState<number | null>(null);
 
   const { mutate: deleteMovement } = useDeleteMovement();
 
-  const handleDelete = (movementId: number) => {
-    if (!versionId) return;
-    if (confirm('Tem certeza que deseja deletar esta movimentação?')) {
-      deleteMovement({ movementId, versionId });
-    }
+  const handleDeleteClick = (movementId: number) => {
+    setMovementToDelete(movementId);
+    setIsConfirmDeleteOpen(true);
   };
 
-  const financialMovements = movements.filter(m => m.description !== 'Compra de Imóvel');
-  const immobilizedMovements = movements.filter(m => m.description === 'Compra de Imóvel');
+  const handleConfirmDelete = () => {
+    if (!versionId || !movementToDelete) return;
+    deleteMovement({ movementId: movementToDelete, versionId });
+    setIsConfirmDeleteOpen(false);
+    setMovementToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setIsConfirmDeleteOpen(false);
+    setMovementToDelete(null);
+  };
+
+  const financialMovements = movements.filter(m => m.type === 'ENTRADA' || m.type === 'SAIDA');
+  const immobilizedMovements = movements.filter(m => m.type === 'IMOBILIZADA');
 
   const filteredMovements = activeFilter === 'financeira'
     ? financialMovements
@@ -51,7 +64,7 @@ export function MovementsList({ movements, versionId }: MovementsListProps) {
             onValueChange={(value) => {
               if (value) setActiveFilter(value);
             }}
-            className="bg-white/5 p-1 rounded-lg"
+            className="bg-white/5 p-1 rounded-lg flex-wrap"
           >
             <ToggleGroupItem value="financeira" className="px-3 py-1 text-sm text-gray-300 rounded-md data-[state=on]:bg-[#1b1b1b] data-[state=on]:text-white">
               Financeiras
@@ -66,12 +79,12 @@ export function MovementsList({ movements, versionId }: MovementsListProps) {
           {filteredMovements.map((movement) => (
             <MovementCard
               key={movement.id}
-              type={movement.type === 'ENTRADA' ? 'credit' : 'debit'}
+              type={movement.type === 'ENTRADA' ? 'credit' : movement.type === 'SAIDA' ? 'debit' : 'immobilized'}
               title={movement.description}
               details={`Frequência: ${movement.frequency}`}
               amount={`R$ ${movement.value.toLocaleString('pt-BR')}`}
               onEdit={() => setEditingMovement(movement)}
-              onDelete={() => handleDelete(movement.id)}
+              onDelete={() => handleDeleteClick(movement.id)}
             />
           ))}
         </div>
@@ -86,6 +99,13 @@ export function MovementsList({ movements, versionId }: MovementsListProps) {
         onClose={() => setEditingMovement(null)}
         movement={editingMovement}
         versionId={versionId}
+      />
+      <ConfirmationDialog
+        isOpen={isConfirmDeleteOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        description="Tem certeza que deseja deletar esta movimentação? Esta ação não pode ser desfeita."
       />
     </>
   );

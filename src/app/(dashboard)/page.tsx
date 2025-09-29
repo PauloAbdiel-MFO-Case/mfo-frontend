@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { ClientNavTabs } from "@/components/client-nav-tabs";
@@ -15,15 +15,22 @@ import { ProjectionCard } from "@/components/projection-card";
 import { useGetSimulations } from "@/hooks/useGetSimulations";
 import { Timeline } from "@/components/timeline";
 import { useGetSimulationVersionDetails } from "@/hooks/useGetSimulationVersionDetails";
+import { SimulationsList } from '@/components/simulations-list';
+import { useGetProjection } from '@/hooks/useGetProjection';
 
 function DashboardPage() {
   const searchParams = useSearchParams();
   const versionIdFromUrl = searchParams.get('versionId');
 
   const [selectedVersionId, setSelectedVersionId] = useState<number | null>(null);
+  const [status, setStatus] = useState('Vivo');
 
   const { data: simulations, isLoading: isLoadingSimulations } = useGetSimulations();
   const { data: versionDetails, isLoading: isLoadingDetails } = useGetSimulationVersionDetails(selectedVersionId);
+  const { data: projectionData, isLoading: isProjectionLoading, isError: isProjectionError } = useGetProjection({
+    simulationVersionId: selectedVersionId,
+    status: status,
+  });
 
   useEffect(() => {
     if (versionIdFromUrl) {
@@ -31,10 +38,34 @@ function DashboardPage() {
       if (selectedVersionId !== id) {
         setSelectedVersionId(id);
       }
-    } else if (simulations && simulations.length > 0 && !selectedVersionId) {
-      setSelectedVersionId(simulations[0].id);
+    } else if (simulations && simulations.length > 0) {
+      // Check if the currently selected version still exists in the simulations list
+      const selectedExists = simulations.some(s => s.id === selectedVersionId);
+
+      if (!selectedExists) {
+        // If the selected version was deleted or doesn't exist, select a new default
+        const currentSituation = simulations.find(s => s.simulation.name === 'Situação Atual');
+        setSelectedVersionId(currentSituation ? currentSituation.id : simulations[0].id);
+      }
+    } else if (simulations && simulations.length === 0 && selectedVersionId !== null) {
+      // If there are no simulations left, clear the selectedVersionId
+      setSelectedVersionId(null);
     }
   }, [simulations, selectedVersionId, versionIdFromUrl]);
+
+  const { currentNetWorth, tenYearProjection } = useMemo(() => {
+    if (!projectionData || !projectionData.withInsurance || projectionData.withInsurance.length === 0) {
+      return { currentNetWorth: 0, tenYearProjection: 0 };
+    }
+
+    const firstYearData = projectionData.withInsurance[0];
+    const current = firstYearData.financialPatrimony + firstYearData.nonFinancialPatrimony;
+
+    const tenYearData = projectionData.withInsurance.length > 10 ? projectionData.withInsurance[10] : projectionData.withInsurance[projectionData.withInsurance.length - 1];
+    const tenYear = tenYearData.financialPatrimony + tenYearData.nonFinancialPatrimony;
+
+    return { currentNetWorth: current, tenYearProjection: tenYear };
+  }, [projectionData]);
 
   const handleSelectSimulation = (id: number) => {
     setSelectedVersionId(id);
@@ -45,22 +76,22 @@ function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center">
+    <div className="flex flex-col">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <ClientSelector />
       </div>
       <ClientNavTabs />
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
-          <NetWorth />
+          <NetWorth value={currentNetWorth} />
         </div>
         <div className="lg:col-span-2">
-          <OverviewCards />
+          <OverviewCards currentPatrimony={currentNetWorth} tenYearProjection={tenYearProjection} />
         </div>
       </div>
       
-      <StatusSelector />
+      <StatusSelector status={status} onStatusChange={setStatus} />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
@@ -68,6 +99,9 @@ function DashboardPage() {
             simulations={simulations || []}
             selectedVersionId={selectedVersionId}
             onSelectSimulation={handleSelectSimulation}
+            projectionData={projectionData}
+            isProjectionLoading={isProjectionLoading}
+            isProjectionError={isProjectionError}
           />
         </div>
         <div className="lg:col-span-1">

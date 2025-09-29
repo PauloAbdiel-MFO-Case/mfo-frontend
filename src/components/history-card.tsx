@@ -9,6 +9,7 @@ interface Version extends Record<string, any> {
   id: number;
   version: number;
   createdAt: string;
+  finalPatrimony: number;
 }
 
 interface HistoryCardProps {
@@ -17,6 +18,14 @@ interface HistoryCardProps {
 }
 
 export function HistoryCard({ simulationName, versions }: HistoryCardProps) {
+
+  const formattedValue = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+    }).format(value);
+  }
+
   return (
     <Card className="bg-gradient-to-b from-white/[.015] to-transparent ring-1 ring-white/5">
       <CardHeader>
@@ -38,7 +47,7 @@ export function HistoryCard({ simulationName, versions }: HistoryCardProps) {
               {versions.map((v, index) => (
                 <TableRow key={index} className="border-b-white/10">
                   <TableCell className="font-medium text-white">{new Date(v.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-white">N/A</TableCell>
+                  <TableCell className="text-white">{formattedValue(v.finalPatrimony)}</TableCell>
                   <TableCell className="text-white">65</TableCell>
                   <TableCell className="text-white">{v.version}</TableCell>
                   <TableCell className="text-right">

@@ -20,13 +20,22 @@ function OverviewCard({ title, value, barColor }: OverviewCardProps) {
     )
 }
 
-export function OverviewCards() {
+interface OverviewCardsProps {
+  currentPatrimony: number;
+  tenYearProjection: number;
+}
+
+const formatToMillion = (value: number) => {
+  if (!value) return "R$ 0.00M";
+  return `R$ ${(value / 1000000).toFixed(2)}M`;
+}
+
+export function OverviewCards({ currentPatrimony, tenYearProjection }: OverviewCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <OverviewCard title="Patrimônio Atual" value="R$ 2.67M" barColor="linear-gradient(90deg, #34d1ff, #5e3bff)" />
-        <OverviewCard title="Projeção 10a" value="R$ 3.17M" barColor="linear-gradient(90deg, #2de27a, #1fb2ff)" />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <OverviewCard title="Patrimônio Atual" value={formatToMillion(currentPatrimony)} barColor="linear-gradient(90deg, #34d1ff, #5e3bff)" />
+        <OverviewCard title="Projeção 10a" value={formatToMillion(tenYearProjection)} barColor="linear-gradient(90deg, #2de27a, #1fb2ff)" />
         <OverviewCard title="Aposentadoria" value="65 anos" barColor="linear-gradient(90deg, #8f61ff, #ff6b6b)" />
-        {/* Você pode adicionar mais cards aqui se precisar */}
     </div>
   );
 }

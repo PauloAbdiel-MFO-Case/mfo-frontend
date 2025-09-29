@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { AddInsuranceModal } from './add-insurance-modal';
 import { EditInsuranceModal } from './edit-insurance-modal';
 import { useDeleteInsurance } from '@/hooks/useDeleteInsurance';
+import { ConfirmationDialog } from './confirmation-dialog';
 
 interface InsurancesListProps {
     insurances: Insurance[];
@@ -14,14 +15,26 @@ interface InsurancesListProps {
 export function InsurancesList({ insurances, versionId }: InsurancesListProps) {
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const [editingInsurance, setEditingInsurance] = useState<Insurance | null>(null);
+    const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+    const [insuranceToDelete, setInsuranceToDelete] = useState<number | null>(null);
 
     const { mutate: deleteInsurance } = useDeleteInsurance();
 
-    const handleDelete = (insuranceId: number) => {
-        if (!versionId) return;
-        if (confirm('Tem certeza que deseja deletar este seguro?')) {
-            deleteInsurance({ insuranceId, versionId });
-        }
+    const handleDeleteClick = (insuranceId: number) => {
+        setInsuranceToDelete(insuranceId);
+        setIsConfirmDeleteOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!versionId || !insuranceToDelete) return;
+        deleteInsurance({ insuranceId: insuranceToDelete, versionId });
+        setIsConfirmDeleteOpen(false);
+        setInsuranceToDelete(null);
+    };
+
+    const handleCancelDelete = () => {
+        setIsConfirmDeleteOpen(false);
+        setInsuranceToDelete(null);
     };
 
     return (
@@ -39,7 +52,7 @@ export function InsurancesList({ insurances, versionId }: InsurancesListProps) {
                             details={`Prêmio: R$ ${insurance.monthlyPremium}/mês`}
                             value={`R$ ${insurance.insuredValue.toLocaleString('pt-BR')}`}
                             onEdit={() => setEditingInsurance(insurance)}
-                            onDelete={() => handleDelete(insurance.id)}
+                            onDelete={() => handleDeleteClick(insurance.id)}
                         />
                     ))}
                 </div>
@@ -54,6 +67,13 @@ export function InsurancesList({ insurances, versionId }: InsurancesListProps) {
                 onClose={() => setEditingInsurance(null)}
                 insurance={editingInsurance}
                 versionId={versionId}
+            />
+            <ConfirmationDialog
+                isOpen={isConfirmDeleteOpen}
+                onClose={handleCancelDelete}
+                onConfirm={handleConfirmDelete}
+                title="Confirmar Exclusão"
+                description="Tem certeza que deseja deletar este seguro? Esta ação não pode ser desfeita."
             />
         </>
     )

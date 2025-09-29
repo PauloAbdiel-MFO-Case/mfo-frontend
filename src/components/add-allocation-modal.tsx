@@ -15,10 +15,9 @@ const formSchema = z.object({
   type: z.enum(['FINANCEIRA', 'IMOBILIZADA']),
   value: z.coerce.number().positive('O valor deve ser positivo.'),
   date: z.coerce.date(),
-  // Campos opcionais que podem ser adicionados depois
-  // initialPayment: z.coerce.number().optional(),
-  // installments: z.coerce.number().int().optional(),
-  // interestRate: z.coerce.number().optional(),
+  initialPayment: z.coerce.number().optional(),
+  installments: z.coerce.number().int().optional(),
+  interestRate: z.coerce.number().optional(),
 });
 
 interface AddAllocationModalProps {
@@ -37,6 +36,8 @@ export function AddAllocationModal({ versionId, isOpen, onClose }: AddAllocation
       date: new Date(),
     },
   });
+
+  const type = form.watch('type');
 
   const { mutate: addAllocation, isPending } = useAddAllocation();
 
@@ -95,6 +96,25 @@ export function AddAllocationModal({ versionId, isOpen, onClose }: AddAllocation
 
             <FormField
               control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-300">Data</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      className="bg-black/30 border-white/10"
+                      {...field}
+                      value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="type"
               render={({ field }) => (
                 <FormItem>
@@ -115,7 +135,49 @@ export function AddAllocationModal({ versionId, isOpen, onClose }: AddAllocation
               )}
             />
 
-            {/* TODO: Adicionar campos de data e de financiamento */}
+            {type === 'IMOBILIZADA' && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="initialPayment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Valor de Entrada</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" className="bg-black/30 border-white/10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="installments"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Nº de Parcelas</FormLabel>
+                      <FormControl>
+                        <Input type="number" className="bg-black/30 border-white/10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="interestRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Taxa de Juros (%)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" className="bg-black/30 border-white/10" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
 
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={onClose} className="border-white/10 bg-white/5 hover:bg-white/10">

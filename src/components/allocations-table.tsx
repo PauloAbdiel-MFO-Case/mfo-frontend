@@ -16,9 +16,8 @@ interface AllocationsTableProps {
 }
 
 export function AllocationsTable({ allocations, versionId }: AllocationsTableProps) {
-  const [isAddModalOpen, setAddModalOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<AllocationRecord | null>(null);
-  const [selectedAllocationId, setSelectedAllocationId] = useState<number | null>(null);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
 
   const { mutate: deleteRecord } = useDeleteAllocationRecord();
 
@@ -44,11 +43,31 @@ export function AllocationsTable({ allocations, versionId }: AllocationsTablePro
     setSelectedAllocationId(null);
   };
 
-  const handleDelete = (recordId: number) => {
-    if (!versionId) return;
-    if (confirm('Tem certeza que deseja deletar este registro?')) {
-      deleteRecord({ recordId, versionId });
-    }
+  const handleOpenUpdateModal = (allocationId: number) => {
+    setUpdatingAllocationId(allocationId);
+    setIsUpdateModalOpen(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+    setUpdatingAllocationId(null);
+  };
+
+  const handleDeleteClick = (recordId: number) => {
+    setRecordToDelete(recordId);
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!versionId || !recordToDelete) return;
+    deleteRecord({ recordId: recordToDelete, versionId });
+    setIsConfirmDeleteOpen(false);
+    setRecordToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setIsConfirmDeleteOpen(false);
+    setRecordToDelete(null);
   };
 
   return (
@@ -63,7 +82,10 @@ export function AllocationsTable({ allocations, versionId }: AllocationsTablePro
               <div key={group.id}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-white">{group.name} ({group.type})</h3>
-                  <Button size="sm" className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400" onClick={() => handleOpenAddModal(group.id)}>+ Adicionar Registro</Button>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="bg-green-500/10 hover:bg-green-500/20 text-green-400" onClick={() => handleOpenUpdateModal(group.id)}>Atualizar</Button>
+                    <Button size="sm" className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400" onClick={() => handleOpenAddModal(group.id)}>+ Adicionar Registro</Button>
+                  </div>
                 </div>
                 <table className="w-full text-sm text-left text-zinc-400">
                   <thead className="text-xs uppercase text-zinc-500 border-b border-zinc-700">
@@ -89,7 +111,7 @@ export function AllocationsTable({ allocations, versionId }: AllocationsTablePro
                               <DropdownMenuItem onSelect={() => setEditingRecord(record)} className="focus:bg-white/10">
                                 Editar
                               </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={() => handleDelete(record.id)} className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                              <DropdownMenuItem onSelect={() => handleDeleteClick(record.id)} className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
                                 Deletar
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -115,6 +137,13 @@ export function AllocationsTable({ allocations, versionId }: AllocationsTablePro
         onClose={() => setEditingRecord(null)}
         record={editingRecord}
         versionId={versionId}
+      />
+      <ConfirmationDialog
+        isOpen={isConfirmDeleteOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        description="Tem certeza que deseja deletar este registro de alocação? Esta ação não pode ser desfeita."
       />
     </>
   );

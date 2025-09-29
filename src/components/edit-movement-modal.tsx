@@ -13,7 +13,7 @@ import { Movement } from '@/types/simulation.types';
 import { useUpdateMovement } from '@/hooks/useUpdateMovement';
 
 const formSchema = z.object({
-  type: z.enum(['ENTRADA', 'SAIDA']),
+  type: z.enum(['ENTRADA', 'SAIDA', 'IMOBILIZADA']),
   description: z.string().min(1, 'A descrição é obrigatória.'),
   value: z.coerce.number().positive('O valor deve ser positivo.'),
   frequency: z.enum(['UNICA', 'MENSAL', 'ANUAL']),
@@ -113,6 +113,7 @@ export function EditMovementModal({ movement, versionId, isOpen, onClose }: Edit
                     <SelectContent className="bg-[#141414] border-white/10 text-white">
                       <SelectItem value="ENTRADA">Entrada</SelectItem>
                       <SelectItem value="SAIDA">Saída</SelectItem>
+                      <SelectItem value="IMOBILIZADA">Imobilizada</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -143,7 +144,33 @@ export function EditMovementModal({ movement, versionId, isOpen, onClose }: Edit
               )}
             />
 
-            {/* TODO: Add date pickers for startDate and endDate */}
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-300">Data de Início</FormLabel>
+                  <FormControl>
+                    <Input type="date" className="bg-black/30 border-white/10" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-300">Data de Fim (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input type="date" className="bg-black/30 border-white/10" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={onClose} className="border-white/10 bg-white/5 hover:bg-white/10">
