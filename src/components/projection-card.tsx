@@ -41,7 +41,7 @@ export function ProjectionCard({
 
   const { data: projectionData, isLoading: isProjectionLoading, isError: isProjectionError } = useGetProjection({
     simulationVersionId: selectedVersionId,
-    status: 'Vivo',
+    status: 'Invalido',
     calculateWithoutInsurance: showWithoutInsurance,
   });
 
@@ -142,6 +142,7 @@ export function ProjectionCard({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
+                        key={sim.id}
                         onClick={() => onSelectSimulation(sim.id)}
                         variant="ghost"
                         onMouseEnter={() => setHovered(sim.id)}

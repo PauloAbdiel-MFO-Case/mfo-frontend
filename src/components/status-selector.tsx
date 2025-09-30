@@ -13,8 +13,8 @@ export function StatusSelector({ status, onStatusChange }: StatusSelectorProps) 
     <div className="flex items-center justify-center py-4">
       <RadioGroup value={status} onValueChange={onStatusChange} className="flex flex-col sm:flex-row gap-4 sm:gap-8">
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="Vivo" id="r-vivo" />
-          <Label htmlFor="r-vivo" className={status === 'Vivo' ? 'text-cyan-400 font-bold' : 'text-gray-400'}>Vivo</Label>
+          <RadioGroupItem value="Invalido" id="r-Invalido" />
+          <Label htmlFor="r-Invalido" className={status === 'Invalido' ? 'text-cyan-400 font-bold' : 'text-gray-400'}>Invalido</Label>
         </div>
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="Morto" id="r-morto" />

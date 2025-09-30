@@ -4,7 +4,7 @@ import { FullProjectionResult } from '@/types/projection.types';
 
 interface GetProjectionParams {
   simulationVersionId: number | null;
-  status: 'Vivo' | 'Morto';
+  status: 'Invalido' | 'Morto';
   calculateWithoutInsurance?: boolean;
 }
 

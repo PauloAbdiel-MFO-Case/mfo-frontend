@@ -19,7 +19,7 @@ import { useGetProjection } from '@/hooks/useGetProjection';
 
 interface GetProjectionParams {
   simulationVersionId: number | null;
-  status: 'Vivo' | 'Morto';
+  status: 'Invalido' | 'Morto';
   calculateWithoutInsurance?: boolean;
 }
 
@@ -28,7 +28,7 @@ function DashboardPage() {
   const versionIdFromUrl = searchParams.get('versionId');
 
   const [selectedVersionId, setSelectedVersionId] = useState<number | null>(null);
-  const [status, setStatus] = useState<GetProjectionParams["status"]>('Vivo');
+  const [status, setStatus] = useState<GetProjectionParams["status"]>('Invalido');
 
   const { data: simulations, isLoading: isLoadingSimulations } = useGetSimulations();
   const { data: versionDetails, isLoading: isLoadingDetails } = useGetSimulationVersionDetails(selectedVersionId);

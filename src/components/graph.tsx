@@ -10,7 +10,6 @@ import {
 } from "recharts";
 import { ProjectionResult } from "@/types/projection.types";
 
-// Helper para formatar o eixo Y do gráfico
 const formatYAxis = (tick: number) => {
   if (tick >= 1000000) {
     return `R$ ${(tick / 1000000).toFixed(1)}M`;
@@ -28,17 +27,34 @@ interface GraphProps {
   isError: boolean;
 }
 
-export function Graph({ projectionData, projectionDataWithoutInsurance, isLoading, isError }: GraphProps) {
+export function Graph({
+  projectionData,
+  projectionDataWithoutInsurance,
+  isLoading,
+  isError,
+}: GraphProps) {
   if (isLoading) {
-    return <div className="h-[250px] w-full flex items-center justify-center text-gray-400">Carregando projeção...</div>;
+    return (
+      <div className="h-[250px] w-full flex items-center justify-center text-gray-400">
+        Carregando projeção...
+      </div>
+    );
   }
 
   if (isError) {
-    return <div className="h-[250px] w-full flex items-center justify-center text-red-400">Erro ao carregar dados.</div>;
+    return (
+      <div className="h-[250px] w-full flex items-center justify-center text-red-400">
+        Erro ao carregar dados.
+      </div>
+    );
   }
 
   if (!projectionData || projectionData.length === 0) {
-    return <div className="h-[250px] w-full flex items-center justify-center text-orange-400">Aguardando seleção ou dados indisponíveis...</div>;
+    return (
+      <div className="h-[250px] w-full flex items-center justify-center text-orange-400">
+        Aguardando seleção ou dados indisponíveis...
+      </div>
+    );
   }
 
   return (
@@ -50,7 +66,7 @@ export function Graph({ projectionData, projectionDataWithoutInsurance, isLoadin
         >
           <defs>
             <linearGradient id="colorFinancial" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#2de27a" stopOpacity={0.6} /> 
+              <stop offset="5%" stopColor="#2de27a" stopOpacity={0.6} />
               <stop offset="95%" stopColor="#2de27a" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="colorNonFinancial" x1="0" y1="0" x2="0" y2="1">
@@ -62,16 +78,29 @@ export function Graph({ projectionData, projectionDataWithoutInsurance, isLoadin
               <stop offset="95%" stopColor="#ffc658" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis dataKey="year" stroke="#9aa0a6" fontSize={12} tickLine={false} axisLine={false} />
-          <YAxis stroke="#9aa0a6" fontSize={12} tickLine={false} axisLine={false} tickFormatter={formatYAxis} />
+          <XAxis
+            dataKey="year"
+            stroke="#9aa0a6"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            stroke="#9aa0a6"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={formatYAxis}
+          />
           <Tooltip
             contentStyle={{
               background: "#141414",
               border: "1px solid rgba(255, 255, 255, 0.1)",
               borderRadius: "10px",
             }}
-            labelStyle={{ color: '#ffffff' }}
+            labelStyle={{ color: "#ffffff" }}
           />
+
           <Area
             type="monotone"
             dataKey="nonFinancialPatrimony"
@@ -86,6 +115,7 @@ export function Graph({ projectionData, projectionDataWithoutInsurance, isLoadin
             dataKey="financialPatrimony"
             stackId="1"
             stroke="#2de27a"
+            strokeDasharray="4 4"
             fill="url(#colorFinancial)"
             strokeWidth={2}
           />
@@ -95,7 +125,7 @@ export function Graph({ projectionData, projectionDataWithoutInsurance, isLoadin
               dataKey="totalPatrimony"
               data={projectionDataWithoutInsurance}
               stroke="#ffc658"
-              strokeDasharray="5 5"
+              strokeDasharray="4 4"
               fill="url(#colorTotalWithoutInsurance)"
               strokeWidth={2}
               name="Total s/ Seguros"
