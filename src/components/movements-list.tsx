@@ -53,7 +53,7 @@ export function MovementsList({ movements, versionId }: MovementsListProps) {
       <section>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <h2 className="text-xl font-bold text-green-400">Movimentações</h2>
+            <h2 className="text-xl font-bold text-blue-400">Movimentações</h2>
             <Button size="sm" className="bg-green-500/10 hover:bg-green-500/20 text-green-400" onClick={() => setAddModalOpen(true)}>+</Button>
           </div>
 

@@ -41,7 +41,7 @@ export function InsurancesList({ insurances, versionId }: InsurancesListProps) {
         <>
             <section>
                 <div className="flex items-center gap-4 mb-4">
-                    <h2 className="text-xl font-bold text-fuchsia-400 mt-8">Seguros</h2>
+                    <h2 className="text-xl font-bold text-blue-400 mt-8">Seguros</h2>
                     <Button size="sm" className="bg-fuchsia-500/10 hover:bg-fuchsia-500/20 text-fuchsia-400 mt-8" onClick={() => setAddModalOpen(true)}>+</Button>
                 </div>
                 <div className="flex flex-col md:flex-row gap-6">
