@@ -1,15 +1,25 @@
+# Usa a imagem node:20-alpine como base
+FROM node:20-alpine
 
-FROM node:20-alpine AS builder
-
+# Define o diretório de trabalho
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+# Cria o usuário e o grupo com menos privilégios
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
+# Copia os arquivos de definição de pacotes e instala as dependências
+COPY package*.json ./
 RUN npm install
 
-COPY . .
+# Copia o nosso novo script de inicialização e o torna executável
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# Define o ponto de entrada do container para ser o nosso script
+ENTRYPOINT ["entrypoint.sh"]
 
+# Expõe a porta 3000
+EXPOSE 3000
+
+# Define o comando padrão que o entrypoint.sh irá executar
 CMD ["npm", "run", "dev"]
