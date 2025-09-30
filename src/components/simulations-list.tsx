@@ -19,7 +19,6 @@ interface EnrichedSimulation extends Omit<Simulation, 'versions'> {
   versions: EnrichedSimulationVersion[];
 }
 
-// Helper Card component (can be extracted to its own file later)
 interface SimulationCardProps {
   version: EnrichedSimulationVersion;
   simulationName: string;
@@ -51,7 +50,6 @@ function SimulationCard({ version, simulationName, onEdit, onDelete, onCreateNew
   );
 }
 
-// Main List Component
 export function SimulationsList() {
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [editingVersion, setEditingVersion] = useState<EnrichedSimulationVersion | null>(null);

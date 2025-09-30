@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAddAllocationRecord } from "@/hooks/useAddAllocationRecord"; // We will reuse this hook for now
+import { useAddAllocationRecord } from "@/hooks/useAddAllocationRecord";
 
 const formSchema = z.object({
   value: z.coerce.number().min(0, "O valor deve ser positivo."),
@@ -26,12 +26,11 @@ export function UpdateAllocationRecordModal({ isOpen, onClose, allocationId, ver
     }
   });
 
-  const { mutate: addRecord, isPending } = useAddAllocationRecord(); // Reusing the add hook for now
+  const { mutate: addRecord, isPending } = useAddAllocationRecord();
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!allocationId || !versionId) return;
     
-    // The date will be the current date, other info will be inherited by the backend
     addRecord({
       allocationId,
       simulationVersionId: versionId,

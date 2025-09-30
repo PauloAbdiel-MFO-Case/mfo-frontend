@@ -7,7 +7,6 @@ import { EditSimulationModal } from "./edit-simulation-modal";
 import { AddSimulationModal } from "./add-simulation-modal";
 import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { FullProjectionResult } from "@/types/projection.types";
 import { ProjectionTable } from "./projection-table";
 import { useGetProjection } from "@/hooks/useGetProjection";
 import { Switch } from "@/components/ui/switch";

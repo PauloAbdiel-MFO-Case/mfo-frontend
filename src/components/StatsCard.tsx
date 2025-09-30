@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Users, CheckCircle, Clock, XCircle } from "lucide-react"
 
 interface StatsCardProps {
   title: string
