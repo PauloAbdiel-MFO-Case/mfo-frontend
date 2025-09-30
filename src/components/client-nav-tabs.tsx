@@ -9,7 +9,7 @@ export function ClientNavTabs() {
 
   const tabs = [
     { name: "Alocações", href: "/alocacoes" },
-    { name: "Projeção", href: "/" }, // Nossa página principal
+    { name: "Projeção", href: "/" }, 
     { name: "Histórico", href: "/historico" },
   ];
 

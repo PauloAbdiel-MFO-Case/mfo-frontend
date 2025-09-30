@@ -15,15 +15,20 @@ import { ProjectionCard } from "@/components/projection-card";
 import { useGetSimulations } from "@/hooks/useGetSimulations";
 import { Timeline } from "@/components/timeline";
 import { useGetSimulationVersionDetails } from "@/hooks/useGetSimulationVersionDetails";
-import { SimulationsList } from '@/components/simulations-list';
 import { useGetProjection } from '@/hooks/useGetProjection';
+
+interface GetProjectionParams {
+  simulationVersionId: number | null;
+  status: 'Vivo' | 'Morto';
+  calculateWithoutInsurance?: boolean;
+}
 
 function DashboardPage() {
   const searchParams = useSearchParams();
   const versionIdFromUrl = searchParams.get('versionId');
 
   const [selectedVersionId, setSelectedVersionId] = useState<number | null>(null);
-  const [status, setStatus] = useState('Vivo');
+  const [status, setStatus] = useState<GetProjectionParams["status"]>('Vivo');
 
   const { data: simulations, isLoading: isLoadingSimulations } = useGetSimulations();
   const { data: versionDetails, isLoading: isLoadingDetails } = useGetSimulationVersionDetails(selectedVersionId);

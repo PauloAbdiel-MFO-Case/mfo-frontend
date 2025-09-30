@@ -31,6 +31,7 @@ export function ProjectionCard({
   selectedVersionId,
   onSelectSimulation,
 }: ProjectionCardProps) {
+  const [hovered, setHovered] = useState<string | null>(null);
   const [editingSimulation, setEditingSimulation] = useState<SimulationListItem | null>(null);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('graph');
@@ -143,14 +144,20 @@ export function ProjectionCard({
                       <Button
                         onClick={() => onSelectSimulation(sim.id)}
                         variant="ghost"
-                        className={
-                          selectedVersionId === sim.id
-                            ? "text-white bg-green-500/10 hover:bg-green-500/20"
-                            : "text-gray-300 hover:bg-white/10"
-                        }
+                        onMouseEnter={() => setHovered(sim.id)}
+                        onMouseLeave={() => setHovered(null)}
+                        className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        selectedVersionId === sim.id
+                          ? "bg-green-500/20 text-green-400 border border-green-500/40 shadow-md shadow-green-500/20"
+                          : hovered === sim.id
+                          ? "bg-orange/50 text-white border border-orange/20"
+                          : "bg-orange/50 text-gray-400 border border-orange/10 hover:bg-orange/10 hover:text-orange"
+                      }`}
                       >
                         {sim.simulation.name}
-                        {!sim.isLatest && <span className="ml-2 text-yellow-500 text-xs">(Legado)</span>}
+                        {!sim.isLatest && (
+                          <span className="ml-2 text-yellow-500 text-xs">(Legado)</span>
+                        )}
                       </Button>
                     </TooltipTrigger>
                     {!sim.isLatest && (
@@ -184,7 +191,12 @@ export function ProjectionCard({
                 </DropdownMenu>
               </div>
             ))}
-            <Button onClick={() => setAddModalOpen(true)} variant="outline" className="border-white/10 bg-transparent text-gray-300 hover:bg-white/10">+ Adicionar Simulação</Button>
+             <Button
+              onClick={() => setAddModalOpen(true)}
+              className="rounded-full px-4 py-2 text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/40 hover:bg-blue-500/30 hover:text-white shadow-md shadow-blue-500/20 transition-all"
+            >
+              + Adicionar Simulação
+            </Button>
           </div>
         </CardContent>
       </Card>

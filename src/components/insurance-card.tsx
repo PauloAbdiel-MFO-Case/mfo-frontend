@@ -24,7 +24,7 @@ export function InsuranceCard({ title, details, value, onEdit, onDelete }: Insur
               <p className="text-xl font-bold text-fuchsia-400">{value}</p>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/10">
+                  <Button variant="default" size="icon" className="h-8 w-8 hover:bg-white/10">
                     <MoreVertical size={16} />
                   </Button>
                 </DropdownMenuTrigger>

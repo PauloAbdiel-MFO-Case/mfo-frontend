@@ -21,8 +21,10 @@ export function ClientSelector() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-[#1b1b1b] border-white/10 text-white">
-          <DropdownMenuItem>Matheus Silveira</DropdownMenuItem>
-          <DropdownMenuItem>Outro Cliente</DropdownMenuItem>
+          <DropdownMenuItem >Pedro Magalhães</DropdownMenuItem>
+          <DropdownMenuItem>Larissa Alves</DropdownMenuItem>
+          <DropdownMenuItem>Fernando Coelho</DropdownMenuItem>
+          <DropdownMenuItem>Débora Matto</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
